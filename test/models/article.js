@@ -1,36 +1,59 @@
-//插入一个doc，过一会修改，再过一会删除
 'use strict';
 const models = require('../../models');
 const article = models.article;
 const uuid = require('uuid');
 const Promise = require('bluebird');
 const co = require('co');
+const assert = require("assert");
 
-co(function*(){
-    let title = uuid.v4();
-    let content = uuid.v4();
+let title = uuid.v4();
+let content = uuid.v4();
+let newDoc = null;
+let doc = null;
+let newContent = uuid.v4();
 
-    let newDoc = yield new article({
-        title: title,
-        content: content,
-    }).save();
-    console.log('newDoc', newDoc);
+describe('article', function(){
+    it('should create a new article', function(done){
+        new article({
+            title: title,
+            content: content,
+        }).save().then((_doc) => {
+            newDoc = _doc;
+            assert(newDoc.title == title);
+            assert(newDoc.content == content);
+        }).then(done, done);
+    });
+    it('should query same article', function(done){
+        article.findOne({title: title}).then((_doc) => {
+            doc = _doc;
+            assert(newDoc.content == doc.content);
+            assert(newDoc.title == doc.title);
+        }).then(done, done);
+    });
+    it('should have alter article content', function(done){
+        doc.content = newContent;
+        doc.save().then((_doc) => {
+            assert(doc.content != content);
+            assert(doc.content == newContent);
+            assert(doc.content == _doc.content);
+            assert(doc.title == _doc.title);
+        }).then(done, done);
+    });
 
-    let doc = yield article.findOne({title: title});
-    console.log('doc', doc);
+    it('should remove article', function(done){
+        article.remove({title: title, content: newContent}).then(()=>{
+            return article.findOne({title:title});
+        }).then((_doc) => {
+            assert(_doc == null);
+        }).then(done, done);
+    });
 
-    yield Promise.delay(1000);
-
-    let newContent = uuid.v4();
-    doc.content = newContent;
-
-    let oldDoc = yield doc.save();
-    console.log('oldDoc', oldDoc);
-
-    yield Promise.delay(1000);
-
-    let rmResult = yield article.remove({title: title, content: newContent});
-    console.log('rmResult', rmResult);
-
-    process.exit();
+    it('should cannot find old article content', function(done){
+        article.findOne({content: content}).then((_doc) => {
+            assert(_doc == null);
+        }).then(done, done);
+    });
 });
+
+
+

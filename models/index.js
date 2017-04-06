@@ -2,8 +2,9 @@
  * Created by Administrator on 2017/4/5.
  */
 'use strict';
-
+const Promise = require('bluebird');
 const mongoose = require('mongoose');
+mongoose.Promise = Promise;
 const config = require('../config');
 
 mongoose.connect(config.mongodb);
