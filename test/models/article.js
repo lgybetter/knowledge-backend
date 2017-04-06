@@ -54,6 +54,3 @@ describe('article', function(){
         }).then(done, done);
     });
 });
-
-
-
