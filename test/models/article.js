@@ -12,7 +12,7 @@ let newDoc = null;
 let doc = null;
 let newContent = uuid.v4();
 
-describe('article', function(){
+describe('models article', function(){
     it('should create a new article', function(done){
         new article({
             title: title,

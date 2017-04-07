@@ -14,7 +14,7 @@ let newDoc = null;
 let doc = null;
 let newContent = uuid.v4();
 
-describe('resource', function(){
+describe('services resource', function(){
     it('should create a new article', function(done){
         resource.post({
             model:'article',

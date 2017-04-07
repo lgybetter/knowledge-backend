@@ -16,7 +16,7 @@ let newDoc = null;
 let doc = null;
 let newContent = uuid.v4();
 
-describe('resource', function(){
+describe('routers resource', function(){
     it('should create a new article', function(done){
         rq.post(
             "http://localhost:3000/resource",
