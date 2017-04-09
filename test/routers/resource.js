@@ -15,12 +15,12 @@ let content = uuid.v4();
 let newDoc = null;
 let doc = null;
 let newContent = uuid.v4();
-
+let resourceUri = "http://localhost:3000/resource";
 describe('routers resource', function(){
     it('should create a new article', function(done){
         rq.post(
-            "http://localhost:3000/resource",
             {
+                uri: resourceUri,
                 body: {
                     model:'article',
                     data: {
@@ -39,7 +39,7 @@ describe('routers resource', function(){
     it('should query same article', function(done){
         rq.get(
             {
-                uri:"http://localhost:3000/resource",
+                uri:resourceUri,
                 qs: {
                     model:'article',
                     filter: {title: title},
@@ -55,7 +55,7 @@ describe('routers resource', function(){
     it('should have alter article content', function(done){
         rq.put(
             {
-                uri:"http://localhost:3000/resource",
+                uri:resourceUri,
                 body: {
                     model:'article',
                     filter:{title: title},
@@ -64,8 +64,8 @@ describe('routers resource', function(){
                 json: true
             }).then((_doc) => {
             return Promise.all([
-                rq.get({uri:"http://localhost:3000/resource",qs:{model:'article', filter: {content: content}},json:true}),
-                rq.get({uri:"http://localhost:3000/resource",qs:{model:'article', filter: {content: newContent}},json:true})
+                rq.get({uri:resourceUri,qs:{model:'article', filter: {content: content}},json:true}),
+                rq.get({uri:resourceUri,qs:{model:'article', filter: {content: newContent}},json:true})
             ]);
         }).then((_docsArr)=>{
 
@@ -77,14 +77,14 @@ describe('routers resource', function(){
 
     it('should remove article', function(done){
         rq.delete({
-            uri:"http://localhost:3000/resource",
+            uri:resourceUri,
             body:{
                 model:'article',
                 filter:{title: title, content: newContent}
             },
             json:true,
         }).then(()=>{
-            return rq.get({uri:"http://localhost:3000/resource",qs:{model:'article', filter:{title:title}},json:true});
+            return rq.get({uri:resourceUri,qs:{model:'article', filter:{title:title}},json:true});
         }).then((_docs) => {
             //console.log(_docs);
             assert(_docs.length == 0);
