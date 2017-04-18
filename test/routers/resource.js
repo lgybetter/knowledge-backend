@@ -32,8 +32,8 @@ describe('routers resource', function(){
             }).then((body) => {
             //console.log(body);
             assert(typeof body !== 'undefined');
-            assert(body.title == title);
-            assert(body.content == content);
+            assert(body.title === title);
+            assert(body.content === content);
         }).then(done, done);
     });
     it('should query same article', function(done){
@@ -48,8 +48,8 @@ describe('routers resource', function(){
             }).then((body)=>{
             //console.log(body);
             assert(typeof body !== 'undefined');
-            assert(body[0].title == title);
-            assert(body[0].content == content);
+            assert(body[0].title === title);
+            assert(body[0].content === content);
         }).then(done, done);
     });
     it('should have alter article content', function(done){
@@ -69,8 +69,8 @@ describe('routers resource', function(){
             ]);
         }).then((_docsArr)=>{
 
-            assert(_docsArr[0].length == 0);
-            assert(_docsArr[1].length == 1);
+            assert(_docsArr[0].length === 0);
+            assert(_docsArr[1].length === 1);
 
         }).then(done, done);
     });
@@ -87,7 +87,7 @@ describe('routers resource', function(){
             return rq.get({uri:resourceUri,qs:{model:'article', filter:{title:title}},json:true});
         }).then((_docs) => {
             //console.log(_docs);
-            assert(_docs.length == 0);
+            assert(_docs.length === 0);
         }).then(done, done);
     });
 });

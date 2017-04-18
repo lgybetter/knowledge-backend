@@ -8,7 +8,9 @@ const app = require('../app');
 const debug = require('debug')('knowledge:server');
 const http = require('http');
 const config = require('../config');
-const socket2http = require('../socket2http');
+
+const socketIO = require('socket.io');
+
 
 /**
  * Get port from environment and store in Express.
@@ -31,7 +33,31 @@ server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
 
-let io = socket2http.start(server);
+function startSocketIO(server){
+
+    const rq = require('../socketRoutes/rq');
+    const resource = require('../socketRoutes/resource');
+    let table = {rq, resource};
+
+    let io = socketIO(server);
+    io.on('connect', (socket) => {
+        for(let key in table){
+            (function(eventName, func){
+                socket.on(eventName,(data, cb)=>{
+                    cb=typeof cb === "function"?cb:function () {};
+                    try{
+                        func(data, cb);
+                    }catch(err){
+                        let result = {status:'error', location:"local", msg:err};
+                        cb(result);
+                    }
+                });
+            })(key, table[key]);
+        }
+    });
+    return io;
+}
+let io = startSocketIO(server);
 
 /**
  * Normalize a port into a number, string, or false.
