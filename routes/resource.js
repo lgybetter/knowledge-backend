@@ -2,14 +2,38 @@
 const express = require('express');
 const router = express.Router();
 const resource = require('../services/resource');
+const valid = require('../util/validator').restfulValidator;
 
+//需要描述参数提取以及验证的方式 ajv
+router.get('/', valid({
+    query:{},
+    param:{}
+}));
+router.post('/', valid({
+    query:{},
+    param:{},
+    body:{},
+    file:{}
+}));
+router.put('/', valid({
+    query:{},
+    param:{},
+    body:{},
+    file:{}
+}));
+router.delete('/', valid({
+    query:{},
+    param:{},
+    body:{},
+    file:{}
+}));
 //query
 router.get('/', function(req, res, next) {
   let args = req.query;
   console.log(args);
   resource.get(args).then((docs) => {
     res.json(docs);
-  }).catch((err)=>{
+  }).catch((err) => {
     next(err);
   });
 });
@@ -19,7 +43,7 @@ router.put('/', function(req, res, next) {
     let args = req.body;
     resource.update(args).then((docs) => {
         res.json(docs);
-    }).catch((err)=>{
+    }).catch((err) => {
         next(err);
     });
 });
@@ -29,7 +53,7 @@ router.post('/', function(req, res, next) {
     let args = req.body;
     resource.post(args).then((doc) => {
         res.json(doc);
-    }).catch((err)=>{
+    }).catch((err) => {
         next(err);
     });
 });
@@ -39,7 +63,7 @@ router.delete('/', function(req, res, next) {
     let args = req.body;
     resource.remove(args).then((docs) => {
         res.json(docs);
-    }).catch((err)=>{
+    }).catch((err) => {
         next(err);
     });
 });

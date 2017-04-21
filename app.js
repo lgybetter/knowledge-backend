@@ -48,4 +48,6 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
+require('./util/pr').recursive_print_routers(app._router, []);
+
 module.exports = app;

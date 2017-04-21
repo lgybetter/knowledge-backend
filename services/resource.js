@@ -5,7 +5,6 @@
 const models = require('../models');
 class Resource{
     constructor(){
-
     }
     post(args){
         let model = models[args.model];
