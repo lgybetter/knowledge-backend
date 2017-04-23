@@ -17,11 +17,11 @@ let newDoc = null;
 let doc = null;
 let newContent = uuid.v4();
 let wsUrl = "ws://localhost:3000";
-let resourceUri = "http://localhost:3000/resource";
+
 let client = socketIOClient(wsUrl);
-function rpc(opt){
+function rpc(method, url, arg){
     return new Promise((resolve, reject)=>{
-        client.emit("rq", opt, function(err, res){
+        client.emit(url, {method, arg}, function(err, res){
             if(err){
                 reject(err);
             }else{
@@ -30,35 +30,33 @@ function rpc(opt){
         });
     });
 }
-describe('resource rpc over socket2http', function(){
+describe('resource rpc over socket', function(){
     it('should create a new article', function(done){
-        rpc({
-            method:"POST",
-            uri: resourceUri,
-            body: {
+        rpc(
+            "post",
+            '/resource/',
+            {
                 model:'article',
                 data: {
                     title: title,
                     content: content,
                 }
-            },
-            json: true
-        }).then((body) => {
+            }
+        ).then((body) => {
             assert(typeof body !== 'undefined');
             assert(body.title === title);
             assert(body.content === content);
         }).then(done, done);
     });
     it('should query same article', function(done){
-        rpc({
-            method:'GET',
-            uri:resourceUri,
-            qs: {
+        rpc(
+            'get',
+            '/resource/',
+            {
                 model:'article',
                 filter: {title: title},
-            },
-            json: true
-        }).then((body)=>{
+            }
+        ).then((body)=>{
             //console.log(body);
             assert(typeof body !== 'undefined');
             assert(body[0].title === title);
@@ -66,19 +64,18 @@ describe('resource rpc over socket2http', function(){
         }).then(done, done);
     });
     it('should have alter article content', function(done){
-        rpc({
-            method:"PUT",
-            uri:resourceUri,
-            body: {
+        rpc(
+            'put',
+            '/resource/',
+            {
                 model:'article',
                 filter:{title: title},
                 data:{$set:{content: newContent}}
-            },
-            json: true
-        }).then((_doc) => {
+            }
+        ).then((_doc) => {
             return Promise.all([
-                rpc({method:"get",uri:resourceUri,qs:{model:'article', filter: {content: content}},json:true}),
-                rpc({method:"get",uri:resourceUri,qs:{model:'article', filter: {content: newContent}},json:true})
+                rpc("get", '/resource/',{model:'article', filter: {content: content}}),
+                rpc("get", '/resource/',{model:'article', filter: {content: newContent}})
             ]);
         }).then((_docsArr)=>{
 
@@ -89,16 +86,15 @@ describe('resource rpc over socket2http', function(){
     });
 
     it('should remove article', function(done){
-        rpc({
-            method:"DELETE",
-            uri:resourceUri,
-            body:{
+        rpc(
+            "delete",
+            '/resource/',
+            {
                 model:'article',
                 filter:{title: title, content: newContent}
-            },
-            json:true,
-        }).then(()=>{
-            return rpc({method:'get',uri:resourceUri,qs:{model:'article', filter:{title:title}},json:true});
+            }
+        ).then(() => {
+            return rpc('get', '/resource/',{model:'article', filter:{title:title}});
         }).then((_docs) => {
             //console.log(_docs);
             assert(_docs.length === 0);

@@ -6,31 +6,23 @@ const models = require('../models');
 class Resource{
     constructor(){
     }
-    post(args){
-        let model = models[args.model];
-        let data = args.data || {};
-        return new model(data).save();
+    post(model, data = {}){
+        let Model = models[model];
+        return new Model(data).save();
     }
-    get(args){
-        let model = models[args.model];
-        let skip = args.skip || 0;
-        let limit = args.limit || 20;
-        let filter = args.filter || {};
+    get(model, filter = {}, limit = 20, skip = 0){
+        let Model = models[model];
 
-        return model.find(filter).skip(skip).limit(limit);
+        return Model.find(filter).skip(skip).limit(limit);
     }
-    update(args){
-        let model = models[args.model];
-        let filter = args.filter || {};
-        let data = args.data || {};
-        let opts = args.opts || {};
-        return model.update(filter, data, opts);
+    update(model, filter = {}, data = {}, opts = {}){
+        let Model = models[model];
+        return Model.update(filter, data, opts);
     }
-    remove(args){
-        let model = models[args.model];
-        let filter = args.filter || {};
+    remove(model, filter = {}){
+        let Model = models[model];
 
-        return model.remove(filter)
+        return Model.remove(filter)
     }
 }
 module.exports = new Resource();

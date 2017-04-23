@@ -2,69 +2,61 @@
 const express = require('express');
 const router = express.Router();
 const resource = require('../services/resource');
-const valid = require('../util/validator').restfulValidator;
+const mount = require('../framework').mountControllerToRouter;
 
-//需要描述参数提取以及验证的方式 ajv
-router.get('/', valid({
-    query:{},
-    param:{}
-}));
-router.post('/', valid({
-    query:{},
-    param:{},
-    body:{},
-    file:{}
-}));
-router.put('/', valid({
-    query:{},
-    param:{},
-    body:{},
-    file:{}
-}));
-router.delete('/', valid({
-    query:{},
-    param:{},
-    body:{},
-    file:{}
-}));
 //query
-router.get('/', function(req, res, next) {
-  let args = req.query;
-  console.log(args);
-  resource.get(args).then((docs) => {
-    res.json(docs);
-  }).catch((err) => {
-    next(err);
-  });
+mount(router, 'get', '/', resource.get, {
+    map: function(req){return req.query;},
+    arg: {
+        schema: {
+            properties: {
+                model: {type: "string"},
+                filter: {type: 'object'},
+                skip: {type: "number"},
+                limit: {type: "number"}
+            }
+        }
+    }
 });
 
 //update
-router.put('/', function(req, res, next) {
-    let args = req.body;
-    resource.update(args).then((docs) => {
-        res.json(docs);
-    }).catch((err) => {
-        next(err);
-    });
+mount(router,'put','/',resource.update,{
+    map:function(req){return req.body},
+    arg: {
+        schema: {
+            properties: {
+                model: {type: "string"},
+                filter: {type: 'object'},
+                data: {type: "object"},
+                opts: {type: "object"}
+            }
+        }
+    }
 });
 
 //create
-router.post('/', function(req, res, next) {
-    let args = req.body;
-    resource.post(args).then((doc) => {
-        res.json(doc);
-    }).catch((err) => {
-        next(err);
-    });
+mount(router,'post','/',resource.post, {
+    map:function(req){return req.body},
+    arg: {
+        schema: {
+            properties: {
+                model: {type: "string"},
+                data: {type: "object"}
+            }
+        }
+    }
 });
 
 //remove
-router.delete('/', function(req, res, next) {
-    let args = req.body;
-    resource.remove(args).then((docs) => {
-        res.json(docs);
-    }).catch((err) => {
-        next(err);
-    });
+mount(router,'delete','/',resource.remove, {
+    map:function(req){return req.body},
+    arg: {
+        schema: {
+            properties: {
+                model: {type: "string"},
+                filter: {type: 'object'}
+            }
+        }
+    }
 });
 module.exports = router;

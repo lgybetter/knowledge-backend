@@ -16,36 +16,38 @@ let newContent = uuid.v4();
 
 describe('services resource', function(){
     it('should create a new article', function(done){
-        resource.post({
-            model:'article',
-            data: {
+        resource.post(
+            'article',
+            {
                 title: title,
                 content: content,
             }
-        }).then((_doc) => {
+        ).then((_doc) => {
             newDoc = _doc;
             assert(newDoc.title == title);
             assert(newDoc.content == content);
         }).then(done, done);
     });
     it('should query same article', function(done){
-        resource.get({
-            model:'article',
-            filter:{title: title}
-        }).then((_docs) => {
+        resource.get(
+            'article',
+            {title: title},
+            20,
+            0
+        ).then((_docs) => {
             doc = _docs[0];
             assert(newDoc.content == doc.content);
             assert(newDoc.title == doc.title);
         }).then(done, done);
     });
     it('should have alter article content', function(done){
-        resource.update({
-            model:'article',
-            filter:{title: title},
-            data:{$set:{content: newContent}}
-        }).then((_doc) => {
-            return Promise.all([resource.get({model:'article', filter: {content: content}}), resource.get({model:'article', filter: {content: newContent}})]);
-        }).then((_docsArr)=>{
+        resource.update(
+            'article',
+            {title: title},
+            {$set:{content: newContent}}
+        ).then((_doc) => {
+            return Promise.all([resource.get('article', {content: content}), resource.get('article', {content: newContent})]);
+        }).then((_docsArr) => {
 
             assert(_docsArr[0].length == 0);
             assert(_docsArr[1].length == 1);
@@ -54,11 +56,11 @@ describe('services resource', function(){
     });
 
     it('should remove article', function(done){
-        resource.remove({
-            model:'article',
-            filter:{title: title, content: newContent}
-        }).then(()=>{
-            return resource.get({model:'article', filter:{title:title}});
+        resource.remove(
+            'article',
+            {title: title, content: newContent}
+        ).then(() => {
+            return resource.get('article', {title:title});
         }).then((_docs) => {
             assert(_docs.length == 0);
         }).then(done, done);
