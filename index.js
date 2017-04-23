@@ -105,6 +105,7 @@ function startSocketIO(server){
                             }
                         }
                         if(typeof func === 'function'){
+                            console.log(method, eventName, JSON.stringify(arg));
                             let out = yield func(arg);
                             cb(null, out);
                         }else{
