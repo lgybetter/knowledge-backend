@@ -211,10 +211,10 @@ function mountControllerToRouter(router, method, url, controller, opts = {}){
     router.use(url, expressHelper);
     return router;
 }
-const recursive_collect_routers = require('./collectApi').recursive_collect_routers;
+const recursive_collect_apis = require('./collectApi').recursive_collect_apis;
 
 const getApiTable = require('./collectApi').getApiTable;
 
 const startSocketIO = require('./callApiOverSocketIO').startSocketIO;
 
-module.exports = {mountControllerToRouter, recursive_collect_routers, getApiTable, startSocketIO};
+module.exports = {mountControllerToRouter, recursive_collect_apis, getApiTable, startSocketIO};

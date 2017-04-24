@@ -4,7 +4,7 @@ function getApiTable(){
     return socketIORpc;
 }
 
-function recursive_collect_routers(r, prefixs){
+function recursive_collect_apis(r, prefixs){
 
     let s = r.stack;
     if(!s){
@@ -18,7 +18,17 @@ function recursive_collect_routers(r, prefixs){
         let method = {};
 
 
-        let path = si.path || si.regexp.source.split("?(?=\\/|$)").join('').split("^\\/").join('/').split('\\/').join('/');
+        let path = si.path || si.regexp.source;
+
+        while(true){
+          let oldLen = path.length;
+          path = path.split("?(?=\\/|$)").join('').split("^\\/").join('/').split('\\/').join('/');
+
+          if(path.length === oldLen){
+            break;
+          }
+
+        }
 
         if(si.route){
 
@@ -64,21 +74,23 @@ function recursive_collect_routers(r, prefixs){
             if (prefix.slice(-1) === "/") {
                 prefix = prefix.slice(0, -1);
             }
-            console.log(Object.keys(method).join(',') || 'all', prefix);
+
+            //console.log(Object.keys(method).join(',') || 'all', prefix);
+
             if(typeof socketIORpc[prefix] === 'undefined'){
                 socketIORpc[prefix] = [];
             }
-            socketIORpc[prefix].push({supportMethods, func: meta.commonHelper});
+            socketIORpc[prefix].push({supportMethods, func: meta.commonHelper, controllerArgs, opts});
 
-            console.log(JSON.stringify({controllerArgs, opts}));
+            //console.log(JSON.stringify({controllerArgs, opts}));
         }
 
 
         if(typeof si.handle!=='undefined'){
-            recursive_collect_routers(si.handle, prefixs.concat(path));
+            recursive_collect_apis(si.handle, prefixs.concat(path));
         }
     }
 }
 
 
-module.exports = {recursive_collect_routers, getApiTable};
+module.exports = {recursive_collect_apis, getApiTable};

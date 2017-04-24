@@ -72,9 +72,12 @@ const server = http.createServer(app);
 
 const framework = require('./framework');
 
-framework.recursive_collect_routers(app._router, []);
+framework.recursive_collect_apis(app._router, []);
+let apiTable = framework.getApiTable();
 
-let io = framework.startSocketIO(server, framework.getApiTable());
+console.log(JSON.stringify(apiTable, null, '\t'));
+
+let io = framework.startSocketIO(server, apiTable);
 
 /**
  * Listen on provided port, on all network interfaces.
