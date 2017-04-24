@@ -75,7 +75,7 @@ const framework = require('./framework');
 framework.recursive_collect_apis(app._router, []);
 let apiTable = framework.getApiTable();
 
-console.log(JSON.stringify(apiTable, null, '\t'));
+console.log(JSON.stringify(apiTable, null, ' '));
 
 let io = framework.startSocketIO(server, apiTable);
 
