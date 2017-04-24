@@ -1,10 +1,10 @@
 'use strict';
 let socketIORpc = {};
-function getSocketIORpc(){
+function getApiTable(){
     return socketIORpc;
-};
+}
 
-function recursive_print_routers(r, prefixs){
+function recursive_collect_routers(r, prefixs){
 
     let s = r.stack;
     if(!s){
@@ -13,15 +13,16 @@ function recursive_print_routers(r, prefixs){
     for(let i = 0;i < s.length; i++){
         let si = s[i];
 
-        //console.log(si);
+        //console.log(JSON.stringify(si, null, '\t'));
 
         let method = {};
 
-        let path = si.path || si.regexp;
+
+        let path = si.path || si.regexp.source.split("?(?=\\/|$)").join('').split("^\\/").join('/').split('\\/').join('/');
 
         if(si.route){
 
-            //console.log(si.route);
+            //console.log(JSON.stringify(si.route, null, '\t'));
 
             for(let j=0;j<si.route.stack.length;j++){
                 method[si.route.stack[j].method] = true;
@@ -37,28 +38,32 @@ function recursive_print_routers(r, prefixs){
             }
         }
         let name = "<anonymous>";
-        if(si.name != "bound dispatch"){
+        if(si.name !== "bound dispatch"){
             name = si.name;
         }
-        if(name == "<anonymous>"){
+        if(name === "<anonymous>"){
             name = "";
         }
-        if(name == "router"){
+        if(name === "router"){
             name = "";
         }
 
         let prefix = prefixs.concat(path).join('');
-        while(prefix.indexOf("//")!=-1){
+        while (prefix.indexOf("//") !== -1) {
             prefix = prefix.split("//").join('/');
         }
         if(name === "expressHelper" && si.handle && si.handle.meta){
             let meta = si.handle.meta;
             let supportMethods = meta.supportMethods;
-            supportMethods.forEach((m)=>{
+            supportMethods.forEach((m) => {
                 method[m] = true;
             });
             let controllerArgs = meta.controllerArgs;
             let opts = meta.opts;
+
+            if (prefix.slice(-1) === "/") {
+                prefix = prefix.slice(0, -1);
+            }
             console.log(Object.keys(method).join(',') || 'all', prefix);
             if(typeof socketIORpc[prefix] === 'undefined'){
                 socketIORpc[prefix] = [];
@@ -70,9 +75,10 @@ function recursive_print_routers(r, prefixs){
 
 
         if(typeof si.handle!=='undefined'){
-            recursive_print_routers(si.handle, prefixs.concat(path));
+            recursive_collect_routers(si.handle, prefixs.concat(path));
         }
     }
 }
 
-module.exports = {recursive_print_routers, getSocketIORpc};
+
+module.exports = {recursive_collect_routers, getApiTable};

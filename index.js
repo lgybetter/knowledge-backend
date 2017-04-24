@@ -47,17 +47,13 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-require('./framework/pr').recursive_print_routers(app._router, []);
 
-const getTable = require('./framework/pr').getSocketIORpc;
 
 const debug = require('debug')('knowledge:server');
 const http = require('http');
 const co = require('co');
 
 const config = require('./config');
-
-const socketIO = require('socket.io');
 
 
 /**
@@ -73,6 +69,13 @@ app.set('port', port);
 
 const server = http.createServer(app);
 
+
+const framework = require('./framework');
+
+framework.recursive_collect_routers(app._router, []);
+
+let io = framework.startSocketIO(server, framework.getApiTable());
+
 /**
  * Listen on provided port, on all network interfaces.
  */
@@ -80,51 +83,6 @@ const server = http.createServer(app);
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
-
-function startSocketIO(server){
-    let table = getTable();
-
-    let io = socketIO(server);
-    io.on('connect', (socket) => {
-        for(let url in table){
-            (function(eventName, funcs){
-                console.log('mount socket.io event:'+eventName);
-                socket.on(eventName,(data, cb) => {
-                    cb=typeof cb === "function"?cb:function () {};
-
-                    let method = data.method.toLowerCase();
-                    let arg = data.arg;
-                    //console.log('data', data, eventName);
-                    co(function*(){
-                        let func = null;
-                        for(let i = 0;i<funcs.length;i++){
-                            let funci = funcs[i];
-                            if(funci.supportMethods.indexOf(method) !== -1){
-                                func = funci.func;
-                                break;
-                            }
-                        }
-                        if(typeof func === 'function'){
-                            console.log(method, eventName, JSON.stringify(arg));
-                            let out = yield func(arg);
-                            cb(null, out);
-                        }else{
-                            throw ("can not method " + eventName);
-                        }
-                    }).catch((err) => {
-
-                        console.log(err);
-
-                        cb(err);
-                    });
-                });
-            })(url, table[url]);
-        }
-    });
-    return io;
-}
-
-let io = startSocketIO(server);
 
 /**
  * Normalize a port into a number, string, or false.

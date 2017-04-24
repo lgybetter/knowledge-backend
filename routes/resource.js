@@ -2,7 +2,8 @@
 const express = require('express');
 const router = express.Router();
 const resource = require('../services/resource');
-const mount = require('../framework').mountControllerToRouter;
+const framework = require('../framework');
+const mount = framework.mountControllerToRouter;
 
 //query
 mount(router, 'get', '/', resource.get, {

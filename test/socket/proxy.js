@@ -21,7 +21,7 @@ let resourceUri = "http://localhost:3000/resource";
 let client = socketIOClient(wsUrl);
 function rpc(opt){
     return new Promise((resolve, reject) => {
-        client.emit("/proxy/", {method:'get', arg:{opt}}, function(err, res){
+        client.emit("/proxy", {method:'get', arg:{opt}}, function(err, res){
             if(err){
                 reject(err);
             }else{

@@ -34,7 +34,7 @@ describe('resource rpc over socket', function(){
     it('should create a new article', function(done){
         rpc(
             "post",
-            '/resource/',
+            '/resource',
             {
                 model:'article',
                 data: {
@@ -51,7 +51,7 @@ describe('resource rpc over socket', function(){
     it('should query same article', function(done){
         rpc(
             'get',
-            '/resource/',
+            '/resource',
             {
                 model:'article',
                 filter: {title: title},
@@ -66,7 +66,7 @@ describe('resource rpc over socket', function(){
     it('should have alter article content', function(done){
         rpc(
             'put',
-            '/resource/',
+            '/resource',
             {
                 model:'article',
                 filter:{title: title},
@@ -74,8 +74,8 @@ describe('resource rpc over socket', function(){
             }
         ).then((_doc) => {
             return Promise.all([
-                rpc("get", '/resource/',{model:'article', filter: {content: content}}),
-                rpc("get", '/resource/',{model:'article', filter: {content: newContent}})
+                rpc("get", '/resource',{model:'article', filter: {content: content}}),
+                rpc("get", '/resource',{model:'article', filter: {content: newContent}})
             ]);
         }).then((_docsArr)=>{
 
@@ -88,13 +88,13 @@ describe('resource rpc over socket', function(){
     it('should remove article', function(done){
         rpc(
             "delete",
-            '/resource/',
+            '/resource',
             {
                 model:'article',
                 filter:{title: title, content: newContent}
             }
         ).then(() => {
-            return rpc('get', '/resource/',{model:'article', filter:{title:title}});
+            return rpc('get', '/resource',{model:'article', filter:{title:title}});
         }).then((_docs) => {
             //console.log(_docs);
             assert(_docs.length === 0);
