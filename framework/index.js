@@ -18,9 +18,35 @@ const acorn = require('acorn');
  * @returns {Function}
  */
 function getMapper(map){
-    return function(req){
-        return req;
+  let rules = map;
+  return function processRename(srcObj){
+    let dstObj = {};
+    for(let lp in rules){
+
+      let rp = rules[lp].split('/').filter(function(v){return v?1:0});
+      lp = lp.split('/').filter(function(v){return v?1:0});
+      //console.log(lp, rp);
+      let getFromSrc = (src, lpart) => {
+        if(lpart.length == 0){return src}
+        let l = lpart.shift();
+        return getFromSrc(src[l], lpart);
+      }
+      let v = getFromSrc(srcObj, lp);
+      //console.log(v);
+      let setToDst = (dst, rpart, value) => {
+        let r = rpart.shift();
+        if(rpart.length == 0){
+          dst[r] = value;
+        }else{
+          if(typeof dst[r] === 'undefined')dst[r] = [];
+          setToDst(dst[r], rpart, value);
+        }
+      }
+      setToDst(dstObj, rp, v);
+      //console.log(dstObj);
     }
+    return dstObj;
+  }
 }
 /*将对象参数转换为数组参数*/
 function objToArray(arg, controllerArgs){
