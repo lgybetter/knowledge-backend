@@ -30,6 +30,7 @@ function rpc(opt){
         });
     });
 }
+
 describe('resource rpc over socket2http', function(){
     it('should create a new article', function(done){
         rpc({

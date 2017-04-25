@@ -2,11 +2,17 @@
 const express = require('express');
 const router = express.Router();
 const resource = require('../services/resource');
+
+
 const framework = require('../framework');
 const mount = framework.mountControllerToRouter;
 
+
 //query
 mount(router, 'get', '/', resource.get, {
+    req: {
+
+    },
     map: function(req){return req.query;},
     arg: {
         schema: {
@@ -17,7 +23,7 @@ mount(router, 'get', '/', resource.get, {
                 limit: {type: "number"}
             }
         }
-    }
+    },
 });
 
 //update
